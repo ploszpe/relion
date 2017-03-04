@@ -2,8 +2,19 @@
 #define CUDA_SETTINGS_H_
 
 // Required compute capability
-#define CUDA_CC_MAJOR 3
-#define CUDA_CC_MINOR 5
+#if not (defined (CUDA_CC_MAJOR) && defined (CUDA_CC_MINOR))
+#error CUDA compatibility is not defined  
+#endif
+
+// __ldg is not available, simply dereference on older arch
+#if defined (__CUDACC__) && __CUDA_ARCH__ < 350
+template<typename T>
+__device__ __forceinline__ T __ldg(const T* ptr) {
+  return *ptr;
+}
+#endif
+
+
 
 #define COMPLEXTEXTURE false
 #define LAUNCH_CHECK

@@ -1007,10 +1007,17 @@ void MlOptimiser::initialise()
                         //else
                         //std::cout << "Found a " << deviceProp.name << " GPU with compute-capability " << deviceProp.major << "." << deviceProp.minor << std::endl;
                 }
-		if(compatibleDevices==0)
-			REPORT_ERROR("You have no GPUs compatible with RELION (CUDA-capable and compute-capability >= 3.5");
-		else if(compatibleDevices!=devCount)
-			std::cerr << "WARNING : at least one of your GPUs is not compatible with RELION (CUDA-capable and compute-capability >= 3.5)" << std::endl;
+		if (compatibleDevices == 0) {
+			std::stringstream errMsg;
+			errMsg
+					<< "You have no GPUs compatible with RELION (CUDA-capable and compute-capability >= "
+					<< CUDA_CC_MAJOR << "." << CUDA_CC_MINOR << ")";
+			REPORT_ERROR(errMsg.str());
+		} else if (compatibleDevices != devCount)
+			std::cerr
+					<< "WARNING : at least one of your GPUs is not compatible with RELION (CUDA-capable and compute-capability >= "
+					<< CUDA_CC_MAJOR << "." << CUDA_CC_MINOR << ")"
+					<< std::endl;
 
 		std::vector < std::vector < std::string > > allThreadIDs;
 		untangleDeviceIDs(gpu_ids, allThreadIDs);

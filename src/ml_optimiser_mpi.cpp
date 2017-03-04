@@ -184,7 +184,7 @@ void MlOptimiserMpi::initialise()
 	}
 
 
-#ifdef CUDA
+//#ifdef CUDA
     /************************************************************************/
 	//Setup GPU related resources
     int devCount, deviceAffinity;
@@ -220,11 +220,17 @@ void MlOptimiserMpi::initialise()
 				//else
 				//std::cout << "Rank " << node->rank  << " found a " << deviceProp.name << " GPU with compute-capability " << deviceProp.major << "." << deviceProp.minor << std::endl;
 			}
-			if(compatibleDevices==0)
-				REPORT_ERROR("You have no GPUs compatible with RELION (CUDA-capable and compute-capability >= 3.5");
-			else if(compatibleDevices!=devCount)
-				std::cerr << "WARNING : at least one of your GPUs is not compatible with RELION (CUDA-capable and compute-capability >= 3.5)" << std::endl;
-
+			if (compatibleDevices == 0) {
+				std::stringstream errMsg;
+				errMsg
+						<< "You have no GPUs compatible with RELION (CUDA-capable and compute-capability >= "
+						<< CUDA_CC_MAJOR << "." << CUDA_CC_MINOR << ")";
+				REPORT_ERROR(errMsg.str());
+			} else if (compatibleDevices != devCount)
+				std::cerr
+						<< "WARNING : at least one of your GPUs is not compatible with RELION (CUDA-capable and compute-capability >= "
+						<< CUDA_CC_MAJOR << "." << CUDA_CC_MINOR << ")"
+						<< std::endl;
 
 			node->relion_MPI_Send(&devCount, 1, MPI_INT, 0, MPITAG_INT, MPI_COMM_WORLD);
 
@@ -483,7 +489,7 @@ void MlOptimiserMpi::initialise()
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
-#endif // CUDA
+//#endif // CUDA
 	/************************************************************************/
 
 #ifdef DEBUG

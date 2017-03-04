@@ -72,11 +72,19 @@ endif()
 # ------------------------------------------------------------------------CUDA-ARCH--
 if(NOT DEFINED CUDA_ARCH)
     message(STATUS "Setting fallback CUDA_ARCH=35")
-    set(CUDARCH "-arch=sm_35")
+    set(CUDA_ARCH "35")
 else(NOT DEFINED CUDA_ARCH)
     message(STATUS "Using provided CUDA_ARCH=${CUDA_ARCH}")
-    set(CUDARCH "-arch=sm_${CUDA_ARCH}")
 endif(NOT DEFINED CUDA_ARCH)
+if (CUDA_ARCH LESS 30 OR NOT CUDA_ARCH MATCHES "^[0-9]+$")
+    message( FATAL_ERROR "Minimum supported cuda arch is 30. (Specified: ${CUDA_ARCH})" )
+endif(CUDA_ARCH LESS 30 OR NOT CUDA_ARCH MATCHES "^[0-9]+$")
+set(CUDARCH "-arch=sm_${CUDA_ARCH}")
+string(SUBSTRING "${CUDA_ARCH}" 0 1 CUDA_ARCH_MAJOR)
+string(SUBSTRING "${CUDA_ARCH}" 1 1 CUDA_ARCH_MINOR)
+
+add_definitions(-DCUDA_CC_MAJOR=${CUDA_ARCH_MAJOR})
+add_definitions(-DCUDA_CC_MINOR=${CUDA_ARCH_MINOR})
 
 # -------------------------------------------------------------------FURTHER OPTIONS--
 option(CUDA "Enable CUDA GPU acceleration" ON)
